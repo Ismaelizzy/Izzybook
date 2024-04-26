@@ -1,0 +1,31 @@
+﻿@page "/Delete"
+@rendermode InteractiveServer
+
+
+
+
+@inject HttpClient HttpClient
+
+<h2>Delete Post</h2>
+
+<button @onclick="DeletePost">Delete Post</button>
+
+@code {
+    [Parameter]
+    public int PostId { get; set; }
+
+    private async Task DeletePost()
+    {
+        var response = await HttpClient.DeleteAsync($"http://127.0.0.1:8000/{PostId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            PostId.Remove(PostId(p => p.Id == PostId));
+        }
+        else
+        {
+           Console.WriteLine("no good");
+        }
+    }
+}
+

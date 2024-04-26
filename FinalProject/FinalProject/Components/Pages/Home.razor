@@ -1,0 +1,84 @@
+﻿@page "/"
+
+@*page "/Post"*@
+@rendermode InteractiveServer
+
+
+
+@inject HttpClient HttpClient
+<style>
+    .post-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .post {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+    }
+
+    .post-image {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 20px;
+    }
+
+    .post-content {
+        flex: 1;
+    }
+
+    .user-id {
+        font-weight: bold;
+    }
+</style>
+
+<h1>Post Page</h1>
+
+@if (posts != null && posts.Any())
+{
+    <div class="post-container">
+        @foreach (var post in posts)
+        {
+            <div class="post">
+                <img class="post-image" src="user-picture.jpg" alt="User Picture" />
+                <div class="post-content">
+                    <h2>@post.PostId</h2>
+                    <p>@post.Content</p>
+                </div>
+                <div class="user-id">
+                    <p>@post.UserId</p>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No posts found.</p>
+}
+
+@code {
+    private List<Post> posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch posts from the backend API
+            posts = await HttpClient.GetFromJsonAsync<List<Post>>("http://127.0.0.1:8000");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching posts: {ex.Message}");
+        }
+    }
+}
+

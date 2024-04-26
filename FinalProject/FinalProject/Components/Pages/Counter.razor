@@ -1,0 +1,680 @@
+﻿@page "/Update"
+@using System.Text.Json;
+
+
+@rendermode InteractiveServer
+
+
+@inject HttpClient HttpClient
+
+<h2>Update Post</h2>
+
+@if (post != null)
+{
+	<h2>Edit Post</h2>
+	<form @onsubmit="UpdatePost">
+		<div>
+			<label for="postId">Post ID:</label>
+			<input type="text" id="postId" @bind="post.PostId" />
+		</div>
+		<div>
+			<label for="userId">User ID:</label>
+			<input type="text" id="userId" @bind="post.UserId" />
+		</div>
+		<div>
+			<label for="content">Content:</label>
+			<input type="text" id="content" @bind="post.Content" />
+		</div>
+		<button type="submit">Update Post</button>
+	</form>
+}
+else
+{
+	<p>No post selected for editing.</p>
+}
+
+
+
+
+
+@code {
+	private Post post;
+
+	// Method to fetch post details for editing
+	private async Task GetPostForEditing(int postId)
+	{
+		// Fetch post details from the server using the post ID
+		post = await HttpClient.GetFromJsonAsync<Post>($"http://127.0.0.1:8000/{postId}");
+	}
+
+	// Method to submit updated post data
+	private async Task UpdatePost()
+	{
+		var response = await HttpClient.PutAsJsonAsync($"http://127.0.0.1:8000/{post.PostId}", post);
+
+		if (response.IsSuccessStatusCode)
+		{
+			Console.WriteLine("updated suc");
+		}
+		else
+		{
+			// Handle error response
+			Console.WriteLine("no suc");
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*
+<div class="container">
+	<div class="search-container">
+		<div class="search-bar">
+			<input type="text" @bind="searchText" placeholder="Search users...">
+			<button @onclick="SearchUsers">Search</button>
+		</div>
+	</div>
+
+	<div class="user-account fade-in">
+		<div>
+			<img src="@currentUser.ProfilePicture" alt="Profile Picture" />
+		</div>
+		<!-- Placeholder for current user account information -->
+	</div>
+
+	<div class="feed-container fade-in">
+		<div class="feed">
+			@foreach (var post in posts)
+			{
+				<div class="post">
+					<div class="user-info">
+						<img src="@post.UserProfilePictureUrl" alt="User Profile Picture">
+						<span class="username">@post.Username</span>
+					</div>
+					<div class="post-content">
+						<p>@post.Content</p>
+						<img src="@post.ImageUrl" alt="Post Image">
+					</div>
+					<div class="post-actions">
+						<button @onclick="() => LikePost(post.Id)">Like</button>
+						<button class="comment-button">Comment</button>
+						<button class="share-button">Share</button>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	private List<Post> posts = new List<Post>();
+	private string searchText;
+	private List<User> searchResults;
+	private User currentUser = new User { UserId = "currentUserId", ProfilePicture = "currentProfilePictureUrl" };
+	private HttpClient httpClient = new HttpClient();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var postResponse = await httpClient.GetAsync("https: //your-fast-api/posts");
+		if (postResponse.IsSuccessStatusCode)
+		{
+			var postContent = await postResponse.Content.ReadAsStringAsync();
+			posts = JsonSerializer.Deserialize<List<Post>>(postContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+		}
+
+		// Uncomment and modify to fetch and display user data
+		/*
+		var userResponse = await httpClient.GetAsync($"http: //localhost:7190/users?search={searchText}");
+		if (userResponse.IsSuccessStatusCode)
+		{
+			var userContent = await userResponse.Content.ReadAsStringAsync();
+			searchResults = JsonSerializer.Deserialize<List<User>>(userContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+		}
+		*/
+	}
+
+	private async Task SearchUsers()
+	{
+		var userResponse = await httpClient.GetAsync($"http: //localhost:7190/users?search={searchText}");
+		if (userResponse.IsSuccessStatusCode)
+		{
+			var userContent = await userResponse.Content.ReadAsStringAsync();
+			searchResults = JsonSerializer.Deserialize<List<User>>(userContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+		}
+	}
+
+	private async Task LikePost(string postId)
+	{
+		var likeResponse = await httpClient.PostAsync($"https: //your-fast-api/posts/{postId}/like", null);
+		if (likeResponse.IsSuccessStatusCode)
+		{
+			// Update the like count of the corresponding post in the UI
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*
+
+<div class="header">
+	<div class="profilepick">
+		<img src="download.jpg" alt="Alternate Text" class="profilepick" />
+
+	</div>
+	<h3 class="head">izzybook</h3>
+	<div class="headerOfProfile">
+		<img src="mountins.jpg" alt="mountins" class="headerPicurre"/>
+	</div>
+
+
+</div>
+
+
+
+	<div class="feed">
+		<div class="post">
+			<div class="user-info">
+				<img src="profile-pic.jpg" alt="User Profile Picture" class="othersProfilePicture">
+				<span class="username">Username</span>
+			</div>
+			<div class="post-content">
+				<p>This is a post content.</p>
+				<img src="post-image.jpg" alt="Post Image" class="postPick">
+			</div>
+			<div class="post-actions">
+				<button class="like-button">Like</button>
+				<button class="comment-button">Comment</button>
+				<button class="share-button">Share</button>
+			</div>
+		</div>
+		<!-- More posts go here -->
+	</div>
+
+
+<!-- adjusted for API -->
+<div class="feed">
+	@foreach (var post in posts)
+	{
+		<div class="post">
+			<div class="user-info">
+				<img src="@post.UserProfilePictureUrl" alt="User Profile Picture">
+				<span class="username">@post.Username</span>
+			</div>
+			<div class="post-content">
+				<p>@post.Content</p>
+				<img src="@post.ImageUrl" alt="Post Image">
+			</div>
+			<div class="post-actions">
+				<button class="like-button">Like</button>
+				<button class="comment-button">Comment</button>
+				<button class="share-button">Share</button>
+			</div>
+		</div>
+	}
+</div>
+
+
+/***********************************************/
+
+
+
+
+<div class="container">
+	<div class="search-container">
+		<div class="search-bar">
+			<input type="text" @bind-value="searchText" @bind-value:event="oninput" placeholder="Search users..." />
+			<button @onclick="SearchUsers">Search</button>
+		</div>
+	</div>
+
+	<div class="user-account fade-in">
+		<div>
+			<!-- <img src="@currentUser.ProfilePicture" alt="Profile Picture" /> -->
+			<img src="download.jpg" alt="Profile-Picture" class="profile-picture" />
+		</div>
+		<!-- Placeholder for current user account information -->
+	</div>
+
+	<img class="background-picture fade-in" src="mountins.jpg" alt="Background Picture" />
+
+	<div class="feed-container fade-in">
+		<div class="feed">
+			<!-- Placeholder for feed content -->
+		</div>
+	</div>
+</div>
+
+
+<div class="container">
+	<div class="search-container">
+		<div class="search-bar">
+			<input type="text" @bind-value="searchText" @bind-value:event="oninput" placeholder="Search users..." />
+			<button @onclick="SearchUsers">Search</button>
+		</div>
+	</div>
+	@*
+	<div class="background-and-profile">
+		<img class="background-picture fade-in" src="mountins.jpg" alt="Background Picture" />
+
+		<div class="user-account fade-in">
+			<div class="profile-picture">
+				<img src="download.jpg" alt="Profile Picture" />
+			</div>
+			<!-- Placeholder for current user account information  @currentUser.ProfilePicture -->
+		</div>
+	</div>
+
+	<div class="feed-container fade-in">
+		<div class="feed">
+			<!-- Placeholder for feed content -->
+		</div>
+	</div>
+</div>
+*@
+
+
+@* This is the current working code
+<div>
+	<header>
+		<div class="container">
+		<!-- Search bar -->
+		<div class="search-container">
+			<div class="search-bar">
+				<input type="text" @bind="searchText" placeholder="Search users...">
+				<button @onclick="SearchUsers">Search</button>
+			</div>
+		</div>
+
+
+			<h1>My Izzybook Feed</h1>
+			</div>
+	</header>
+
+					@foreach(var post in posts)
+		{
+			<!-- Feed -->
+			<div class="feed">
+				<div class="post">
+					<div class="post-header">
+						<img src="profile-pic.jpg" alt="Profile Picture">
+						<div class="post-actions">
+							<button class="like-button" @onclick="IncrementCount1">Like</button>
+							<button class="comment-button">Comment</button>
+							<button class="share-button">Share</button>
+							<p role="status">Likes: @currentCount1</p>
+						</div>
+						<h2>John Doe</h2>
+					</div>
+					<div class="post-content">
+						<p>This is the first post on My Izzybook!</p>
+					</div>
+				</div>
+			</div>
+		}
+
+
+
+
+	<section class="profile-feed">
+		<div class="container">
+
+			<div class="profile-info">
+				<h2>User's Profile</h2>
+			</div>
+
+			<!-- Feed -->
+			<div class="feed">
+				<div class="post">
+					<div class="post-header">
+						<img src="profile-pic.jpg" alt="Profile Picture">
+						<div class="post-actions">
+							<button class="like-button" @onclick="IncrementCount1">Like</button>
+							<button class="comment-button">Comment</button>
+							<button class="share-button">Share</button>
+							<p role="status">Likes: @currentCount1</p>
+						</div>
+						<h2>John Doe</h2>
+					</div>
+					<div class="post-content">
+						<p>This is the first post on My Izzybook!</p>
+					</div>
+				</div>
+				<div class="post">
+					<div class="post-header">
+						<img src="post-image.jpg" alt="Profile Picture">
+						<div class="post-actions">
+							<button class="like-button" @onclick="IncrementCount">Like</button>
+							<button class="comment-button">Comment</button>
+							<button class="share-button">Share</button>
+							<p role="status">Likes: @currentCount</p>
+						</div>
+
+						<h2>Jane Smith</h2>
+					</div>
+					<div class="post-content">
+						<p>Hey, everyone! Check out my latest adventure!</p>
+					</div>
+				</div>
+				<div class="post">
+					<div class="post-header">
+						<img src="download.jpg" alt="Profile Picture">
+						<div class="post-actions">
+							<button class="like-button" @onclick="IncrementCount1">Like</button>
+							<button class="comment-button">Comment</button>
+							<button class="share-button">Share</button>
+							<p role="status">Likes: @currentCount1</p>
+						</div>
+						<h2>Michael Johnson</h2>
+					</div>
+					<div class="post-content">
+						<p>Just finished reading an amazing book. Highly recommend!</p>
+					</div>
+				</div>
+				<div class="post">
+					<div class="post-header">
+						<img src="profile-pic.jpg" alt="Profile Picture">
+						<div class="post-actions">
+							<button class="like-button" @onclick="IncrementCount2">Like</button>
+							<button class="comment-button">Comment</button>
+							<button class="share-button">Share</button>
+							<p role="status">Likes: @currentCount2</p>
+						</div>
+						<h2>Alice Brown</h2>
+					</div>
+					<div class="post-content">
+						<p>Good morning, everyone! Have a fantastic day ahead!</p>
+					</div>
+				</div>
+				<div class="post">
+					<div class="post-header">
+						<img src="post-image.jpg" alt="Profile Picture">
+						<div class="post-actions">
+							<button class="like-button" @onclick="IncrementCount3">Like</button>
+							<button class="comment-button">Comment</button>
+							<button class="share-button">Share</button>
+							<p role="status">Likes: @currentCount3</p>
+						</div>
+						<h2>Chris Wilson</h2>
+					</div>
+					<div class="post-content">
+						<p>Just wanted to share some exciting news with you all!</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer>
+		<div class="container">
+			<p>&copy; 2024 Izzybook</p>
+		</div>
+	</footer>
+</div>
+
+
+
+	@code {
+
+	private int currentCount = 0;
+	private int currentCount1 = 0;
+	private int currentCount2 = 0;
+	private int currentCount3 = 0;
+
+	private void IncrementCount()
+	{
+		currentCount++;
+	}
+	private void IncrementCount1()
+	{
+		currentCount1++;
+	}
+	private void IncrementCount2()
+	{
+		currentCount2++;
+	}
+	private void IncrementCount3()
+	{
+		currentCount3++;
+	}
+
+		private List<Post> posts = new List<Post>();
+
+		protected override async Task OnInitializedAsync()
+		{
+			/*
+			var httpClient = new HttpClient();
+			var response = await httpClient.GetAsync("https: //your-fast-api/posts");
+			if (response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsStringAsync();
+				//posts = JsonSerializer.Deserialize<List<Post>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+			}
+			*/
+		}
+
+
+
+		private string searchText;
+		private List<User> searchResults;
+		private User currentUser = new User { UserId = "currentUserId", ProfilePicture = "currentProfilePictureUrl" };
+
+	private async Task SearchUsers()
+	{
+
+		/*
+		var httpClient = new HttpClient();
+		var response = await httpClient.GetAsync($"http: //localhost:7190/users?search={searchText}");
+
+		if (response.IsSuccessStatusCode)
+		{
+			var content = await response.Content.ReadAsStringAsync();
+			//searchResults = JsonSerializer.Deserialize<List<User>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+		}
+		else
+		{
+			// Handle error
+		}
+		*/
+	}
+
+	}
+	*@
+
+
+
+
+
+
+
+
+
+

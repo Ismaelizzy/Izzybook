@@ -1,0 +1,180 @@
+﻿@page "/Post"
+
+
+@rendermode InteractiveServer
+@*
+<h3>Add New Post</h3>
+
+@if (errorMessage != null)
+{
+    <p>Error: @errorMessage</p>
+}
+
+<form @onsubmit="SubmitForm">
+    <div>
+        <label for="postId">Image URL: post id</label>
+        <input type="text" id="imageUrl" @bind="postImage" />
+    </div>
+   
+    <div>
+        <label for="userId">Image URL: user id</label>
+        <input type="text" id="imageUrl" @bind="postImage" />
+    </div>
+    <div>
+        <label for="content">Content:</label>
+        <input type="text" id="content" @bind="postContent" />
+    </div>
+    <button type="submit">Submit</button>
+</form>
+
+@code {
+    private string postContent;
+    private string postImage;
+    private string errorMessage;
+
+    private async Task SubmitForm()
+    {
+        try
+        {
+            var newPost = new Post { Content = postContent, Image = postImage };
+
+            var httpClient = new HttpClient();
+            var response = await httpClient.PostAsJsonAsync("http://127.0.0.1:8000", newPost);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Post created successfully
+                // Redirect the user to the posts page or show a success message
+                //NavigationManager.NavigateTo("/posts");
+                newPost = new Post();
+            }
+            else
+            {
+                // Handle error response
+                errorMessage = "Failed to create post. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}
+*@
+
+
+
+
+
+@using System.Net.Http.Json
+
+@inject HttpClient HttpClient
+
+
+<div class="container">
+    <h2>Create New Post</h2>
+    <form @onsubmit="CreatePost">
+        <div class="form-group">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" @bind="newPost.UserId" />
+        </div>
+        <div class="form-group">
+            <label for="postId">Post ID:</label>
+            <input type="text" id="postId" @bind="newPost.PostId" />
+        </div>
+        <div class="form-group">
+            <label for="content">Content:</label>
+            <input type="text" id="content" @bind="newPost.Content" />
+        </div>
+        <button type="submit">Create Post</button>
+    </form>
+</div>
+
+
+<style>
+.container {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+</style>
+
+
+
+
+
+@code {
+    private List<Post> posts;
+    private Post newPost = new Post();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch posts from the backend API
+            posts = await HttpClient.GetFromJsonAsync<List<Post>>("http://127.0.0.1:8000");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching posts: {ex.Message}");
+        }
+    }
+
+    private async Task CreatePost()
+    {
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync("http://127.0.0.1:8000", newPost);
+            if (response.IsSuccessStatusCode)
+            {
+                // Refresh posts after creating a new one
+                posts = await HttpClient.GetFromJsonAsync<List<Post>>("http://127.0.0.1:8000");
+                newPost = new Post(); // Reset the form
+            }
+            else
+            {
+                errorMessage = "Failed to create post. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}
